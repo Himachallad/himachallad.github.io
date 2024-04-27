@@ -1,6 +1,6 @@
 export default function Introduction() {
     return <>
-        <div className='grid grid-cols-3 gap-10 font-normal text-8xl pb-5'>
+        <div className='grid grid-cols-3 gap-10 font-normal md:text-8xl text-4xl pb-5'>
             <div>Architect</div>
             <div></div>
             <div></div>

@@ -23,7 +23,7 @@ export default function KnownTechnologies() {
 
     return <>
         <h1 className='font-bold text-4xl mt-20'>Technology</h1>
-        <div className="mt-5 grid grid-rows-2 grid-flow-col gap-x-40 justify-center items-center bg-slate-100">
+        <div className="mt-5 grid md:grid-rows-2 grid-rows-1 md:grid-flow-col md:gap-x-40 justify-center items-center bg-slate-100">
             {knownLangs}
         </div>
 

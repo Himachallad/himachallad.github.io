@@ -11,7 +11,6 @@ export default function Home() {
       <KnownTechnologies />
       <Reviews />
       <Projects />
-      <p>Technology</p>
       <Blogs />
     </main>
   );

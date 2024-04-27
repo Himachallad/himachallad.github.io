@@ -19,6 +19,10 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+      <head>
+        <link rel="icon" href="/favicon/favicon.ico" sizes="any" />
+      </head>
+
       <Script src="https://flackr.github.io/scroll-timeline/dist/scroll-timeline.js" />
       <body className={`${inter.className} bg-green-50`}>
 

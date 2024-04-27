@@ -18,16 +18,33 @@
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
+  background: linear-gradient(to bottom,
       transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+      rgb(var(--background-end-rgb))) rgb(var(--background-start-rgb));
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+}
+
+
+.scroll-watcher {
+  height: 10px;
+  position: fixed;
+  top: 0;
+  z-index: 51;
+  background-color: rgb(16, 140, 16);
+  width: 100%;
+  transform-origin: left;
+  animation: scroll-watcher linear;
+  scale: 0 1;
+  animation-timeline: scroll(y)
+}
+
+@keyframes scroll-watcher {
+  to {
+    scale: 1 1;
   }
 }

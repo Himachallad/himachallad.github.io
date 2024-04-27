@@ -2,6 +2,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/organisms/Header";
 import Footer from "@/components/organisms/Footer";
+import Script from "next/script";
 
 
 const inter = Inter({ subsets: ["latin"] });
@@ -17,6 +18,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+      <Script src="https://flackr.github.io/scroll-timeline/dist/scroll-timeline.js" />
       <body className={`${inter.className} bg-green-50`}>
         <Header />
         {children}

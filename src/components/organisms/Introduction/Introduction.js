@@ -9,7 +9,7 @@ export default function Introduction() {
             <div></div>
             <div></div>
             <div></div>
-            <div className='flex justify-end'>Propel</div>
+            <div className='flex justify-end'>Excel</div>
         </div>
         <div className="border-t border-gray-300 pb-5"></div>
         <h1 className='font-bold text-4xl mt-20'>About me</h1>

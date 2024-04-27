@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Carousel } from "antd";
-import Image from "next/image";
 import Rating from "@/components/molecules/Rating/Rating";
 import RandomUser from "@/components/molecules/RandomUser/RandomUser";
 
@@ -28,13 +27,9 @@ export default function Reviews() {
     }, []);
 
     const [reviews, setReviews] = useState([]);
-
-    const onChange = (currentSlide) => {
-        console.log(currentSlide);
-    };
     return <>
         <h1 className='font-bold text-4xl mt-20'>Reviews</h1>
         <Carousel autoplay
-            autoplaySpeed={5000} className="bg-green-200 mt-5 mb-20 p-10 leading-[20px] text-xl tracking-wide rounded-md" afterChange={onChange}>{reviews}</Carousel >
+            autoplaySpeed={5000} className="bg-green-200 mt-5 mb-20 p-10 leading-[20px] text-xl tracking-wide rounded-md">{reviews}</Carousel >
     </>;
 }

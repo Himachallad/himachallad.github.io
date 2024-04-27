@@ -43,7 +43,6 @@ export default function Projects() {
 
         const projectList = Object.entries(projectNames).map((project, idx) => {
             const [project_key, project_name] = project;
-            console.log(project_name?.body);
             return (<div className='flex cursor-pointer' key={`projects_${project_key}_${idx}`}>
                 <a href={projectLink[project_key]} target="_blank" rel="noopener noreferrer" className="flex">
                     <Image className={`${project_key} rounded-md md:block hidden`}
@@ -68,7 +67,7 @@ export default function Projects() {
 
     return <>
         <h1 className='font-bold text-4xl mt-20 mb-5'>Projects</h1>
-        <div className="grid md:grid-cols-2 gap-10">
+        <div className="grid xl:grid-cols-2 gap-10">
             {projects}
         </div>
     </>;

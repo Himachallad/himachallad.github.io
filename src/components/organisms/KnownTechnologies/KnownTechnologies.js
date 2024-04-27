@@ -22,7 +22,8 @@ export default function KnownTechnologies() {
     const [knownLangs, setKnownLangs] = useState([]);
 
     return <>
-        <div class="grid grid-rows-2 grid-flow-col gap-x-40 justify-center items-center">
+        <h1 className='font-bold text-4xl mt-20'>Technology</h1>
+        <div className="mt-5 grid grid-rows-2 grid-flow-col gap-x-40 justify-center items-center bg-slate-100">
             {knownLangs}
         </div>
 

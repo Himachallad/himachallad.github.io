@@ -3,6 +3,7 @@ import "./globals.css";
 import Header from "@/components/organisms/Header";
 import Footer from "@/components/organisms/Footer";
 import Script from "next/script";
+import { AntdRegistry } from '@ant-design/nextjs-registry';
 
 
 const inter = Inter({ subsets: ["latin"] });
@@ -20,8 +21,10 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <Script src="https://flackr.github.io/scroll-timeline/dist/scroll-timeline.js" />
       <body className={`${inter.className} bg-green-50`}>
+
         <Header />
-        {children}
+        {/* {children} */}
+        <AntdRegistry>{children}</AntdRegistry>
         <Footer />
       </body>
     </html>

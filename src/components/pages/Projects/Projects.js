@@ -51,6 +51,7 @@ export default function Projects() {
                         alt="project"
                         width={300}
                         height={300}
+                        priority
                     />
                     <div className='flex flex-col'>
                         <div className='ml-5 font-medium'>{project_name?.name}</div>

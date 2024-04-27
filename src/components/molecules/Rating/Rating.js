@@ -28,6 +28,7 @@ export default function Rating({ given, total, idx }) {
                 alt="star"
                 width={20}
                 height={20}
+                priority
             />);
         }
 

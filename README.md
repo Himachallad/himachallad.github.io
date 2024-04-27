@@ -2,6 +2,7 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 ## Getting Started
 Node version: 18.20.0
+![Firefly H logo 91409 (1) (1)](https://github.com/Himachallad/himachallad.github.io/assets/20709166/fb5c022b-f0f0-41c3-af1e-743cc49f0422)
 
 First, run the development server:
 

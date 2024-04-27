@@ -29,7 +29,13 @@ export default function Reviews() {
     const [reviews, setReviews] = useState([]);
     return <>
         <h1 className='font-bold text-4xl mt-20'>Reviews</h1>
-        <Carousel autoplay
+        <Carousel
+            dots={
+                {
+                    className: "carousel-control"
+                }
+            }
+            autoplay
             autoplaySpeed={5000} className="bg-green-200 mt-5 mb-20 p-10 leading-[20px] text-xl tracking-wide rounded-md">{reviews}</Carousel >
     </>;
 }

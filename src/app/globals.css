@@ -29,6 +29,17 @@ body {
   }
 }
 
+.carousel-control li {
+  width: 66px !important;
+  height: 5px !important;
+}
+
+.carousel-control li button {
+  width: 48px !important;
+  height: 5px !important;
+  background-color: #166534 !important;
+}
+
 
 .scroll-watcher {
   height: 10px;

@@ -36,6 +36,6 @@ export default function Reviews() {
                 }
             }
             autoplay
-            autoplaySpeed={5000} className="bg-green-200 mt-5 mb-20 p-10 leading-[20px] text-xl tracking-wide rounded-md">{reviews}</Carousel >
+            autoplaySpeed={5000} className="bg-green-200 mt-10 mb-20 p-10 leading-[20px] text-xl tracking-wide rounded-md">{reviews}</Carousel >
     </>;
 }

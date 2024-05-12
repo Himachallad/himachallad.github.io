@@ -4,8 +4,9 @@ import blogConfig from '@/config/blog.config';
 import { useEffect, useState } from 'react';
 import labelsInfo from './label.config';
 import { Button } from 'antd';
+import Link from 'next/link';
 
-export default function Blogs() {
+export default function Blogs({ disableLink }) {
 
     useEffect(() => {
         setFilteredBlogs(blogConfig.filter((blog) => {
@@ -51,8 +52,10 @@ export default function Blogs() {
         />);
     });
 
+    const header = disableLink ? (<h1 className='cursor-default font-bold text-4xl mb-10'>Blogs</h1>) : <Link href={`/blogs`} passHref target="_blank"><h1 className='hover:text-sky-500 cursor-pointer font-bold text-4xl mb-10'>Blogs</h1></Link>;
+
     return <>
-        <h1 className='font-bold text-4xl mb-10'>Blogs</h1>
+        {header}
         <div className='flex justify-center mb-[20px] sm:flex-row flex-col'>{renderedLabels}</div>
         <div className='flex justify-center mb-[50px]'>
             <div className="inline-grid xl:grid-cols-2 grid-cols-1 gap-[100px]">

@@ -14,7 +14,7 @@ export default function Footer() {
                             height={48}
                         />
                     </a>
-                    <a href="https://www.upwork.com/freelancers/~017c77e6882cfe931f" target="_blank" rel="noopener noreferrer" className="flex">
+                    {/* <a href="https://www.upwork.com/freelancers/~017c77e6882cfe931f" target="_blank" rel="noopener noreferrer" className="flex">
                         <Image className="upwork mr-4 cursor-pointer"
                             src={`/icons/social/upwork.svg`}
                             key={"upwork"}
@@ -22,7 +22,7 @@ export default function Footer() {
                             width={48}
                             height={48}
                         />
-                    </a>
+                    </a> */}
                     <a href="https://github.com/Himachallad" target="_blank" rel="noopener noreferrer" className="flex">
                         <Image className="github cursor-pointer"
                             src={`/icons/social/github.svg`}

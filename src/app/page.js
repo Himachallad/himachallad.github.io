@@ -3,6 +3,7 @@ import KnownTechnologies from '@/components/organisms/KnownTechnologies';
 import Blogs from '@/components/pages/Blogs';
 import Projects from '@/components/pages/Projects';
 import Reviews from '@/components/pages/Reviews';
+import { Divider } from 'antd';
 
 export default function Home() {
   return (
@@ -11,7 +12,8 @@ export default function Home() {
       <KnownTechnologies />
       <Reviews />
       <Projects />
-      {/* <Blogs /> */}
+      <Divider />
+      <Blogs />
     </main>
   );
 }

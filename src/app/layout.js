@@ -71,7 +71,6 @@ export default function RootLayout({ children }) {
       <body className={`${inter.className} bg-green-50`}>
 
         <Header />
-        {/* {children} */}
         <AntdRegistry>{children}</AntdRegistry>
         <Footer />
       </body>

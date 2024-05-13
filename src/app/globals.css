@@ -41,7 +41,7 @@ body {
 }
 
 
-.scroll-watcher {
+/* .scroll-watcher {
   height: 10px;
   position: fixed;
   top: 0;
@@ -58,4 +58,4 @@ body {
   to {
     scale: 1 1;
   }
-}
+} */

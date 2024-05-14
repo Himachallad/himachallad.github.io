@@ -1,4 +1,4 @@
-/* .move-from-top {
+.move-from-top {
     animation: move-from-top ease;
     animation-timeline: scroll();
 }
@@ -55,22 +55,22 @@
 
 
 
-.move-from-right {
-    animation: move-from-right ease;
-    animation-timeline: scroll();
+.scale-out {
+    animation: scale-out ease-out 1.2s;
+    /* animation-timeline: view();
     animation-range-start: cover;
-    animation-range-end: 800px;
+    animation-range-end: 800px; */
 }
 
-@keyframes move-from-right {
+@keyframes scale-out {
     0% {
-        transform: translateX(-300px);
         opacity: 0;
+        transform: scale(0.9);
     }
 
     100% {
-        transform: translateX(0px);
         opacity: 1;
+        transform: scale(1);
     }
 }
 
@@ -92,4 +92,4 @@
         opacity: 1;
     }
 
-} */
+}

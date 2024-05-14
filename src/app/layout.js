@@ -1,4 +1,4 @@
-import { Inter } from "next/font/google";
+import { Roboto } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/organisms/Header";
 import Footer from "@/components/organisms/Footer";
@@ -6,7 +6,7 @@ import Script from "next/script";
 import { AntdRegistry } from '@ant-design/nextjs-registry';
 
 
-const inter = Inter({ subsets: ["latin"] });
+const roboto = Roboto({ subsets: ["latin"], weight: '300' });
 
 export const metadata = {
   title: "Himachallad",
@@ -68,7 +68,7 @@ export default function RootLayout({ children }) {
       </head>
 
       <Script src="https://flackr.github.io/scroll-timeline/dist/scroll-timeline.js" />
-      <body className={`${inter.className} bg-green-50`}>
+      <body className={`${roboto.className} bg-green-50`}>
 
         <Header />
         <AntdRegistry>{children}</AntdRegistry>

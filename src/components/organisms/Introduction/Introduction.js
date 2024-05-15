@@ -8,11 +8,11 @@ export default function Introduction() {
             <div></div>
             <div></div>
             <div></div>
-            <div className={`text-green-600 flex justify-center ${styles["scale-out"]}`}>Innovate</div>
+            <div className={`text-green-600 flex justify-center ${styles["scale-out-1"]}`}>Innovate</div>
             <div></div>
             <div></div>
             <div></div>
-            <div className={`text-green-600 flex justify-end ${styles["scale-out"]}`}>Excel</div>
+            <div className={`text-green-600 flex justify-end ${styles["scale-out-2"]}`}>Excel</div>
         </div>
         <Divider />
         <h1 className='font-bold text-4xl mt-20'>About me</h1>

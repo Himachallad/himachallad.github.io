@@ -71,6 +71,17 @@
     }
 }
 
+.scale-out-1 {
+    animation: scale-out ease-out 1.2s;
+    animation-delay: 1.2s;
+}
+
+.scale-out-2 {
+    animation: scale-out ease-out 1.2s;
+    animation-delay: 2.4s;
+}
+
+
 .image-class {
     animation: test linear;
     animation-timeline: view();

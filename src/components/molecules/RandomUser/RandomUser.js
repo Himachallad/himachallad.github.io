@@ -14,8 +14,8 @@ export default function RandomUser({ idx = 0 }) {
                 src={`/icons/users/${randomUserMap[newIdx]}.svg`}
                 key={idx}
                 alt="star"
-                width={60}
-                height={60}
+                width={120}
+                height={120}
             />
         );
 

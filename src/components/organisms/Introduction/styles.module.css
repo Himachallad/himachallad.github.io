@@ -57,9 +57,6 @@
 
 .scale-out {
     animation: scale-out ease-out 1.2s;
-    /* animation-timeline: view();
-    animation-range-start: cover;
-    animation-range-end: 800px; */
 }
 
 @keyframes scale-out {

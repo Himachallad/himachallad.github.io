@@ -45,7 +45,7 @@ export default function Projects() {
             const [project_key, project_name] = project;
             return (<div className='flex cursor-pointer' key={`projects_${project_key}_${idx}`}>
                 <a href={projectLink[project_key]} target="_blank" rel="noopener noreferrer" className="flex flex-col">
-                    <Image className={`${project_key} rounded-md md:block hidden`}
+                    <Image className={`${project_key} brighten rounded-md md:block hidden`}
                         src={`/icons/projects/${project_key}.jpg`}
                         key={`${project_key}_${idx}`}
                         alt="project"
@@ -67,7 +67,7 @@ export default function Projects() {
     const [projects, setProjects] = useState([]);
 
     return <>
-        <h1 className='font-bold text-4xl mt-20 mb-10'>Projects</h1>
+        <h1 className={`font-bold text-4xl mt-20 mb-10`}>Projects</h1>
         <div className='flex justify-center mb-[50px]'>
             <div className="inline-grid xl:grid-cols-2 gap-[100px]">
                 {projects}

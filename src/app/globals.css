@@ -32,3 +32,46 @@
     scale: 1 1;
   }
 }
+
+.brighten {
+  animation-timeline: view(block 100% 0%);
+
+  animation-name: brighten;
+  animation-fill-mode: both;
+  animation-duration: 1ms;
+  /* Firefox requires this to apply the animation */
+  animation-timing-function: linear;
+}
+
+
+@keyframes brighten {
+  from {
+    filter: brightness(0.2);
+  }
+
+  to {
+    filter: brightness(1);
+  }
+}
+
+.tech-animate {
+  animation-timeline: view(block 100% 0%);
+
+  animation-name: tech-animate;
+  animation-fill-mode: both;
+  animation-duration: 1ms;
+  /* Firefox requires this to apply the animation */
+  animation-timing-function: linear;
+}
+
+@keyframes tech-animate {
+  from {
+    filter: brightness(0.2);
+    transform: scale(0.9);
+  }
+
+  to {
+    filter: brightness(1);
+    transform: scale(1);
+  }
+}

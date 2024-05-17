@@ -43,7 +43,7 @@ export default function Projects() {
 
         const projectList = Object.entries(projectNames).map((project, idx) => {
             const [project_key, project_name] = project;
-            return (<div className='flex cursor-pointer' key={`projects_${project_key}_${idx}`}>
+            return (<div className='hover:scale-[1.01] flex cursor-pointer' key={`projects_${project_key}_${idx}`}>
                 <a href={projectLink[project_key]} target="_blank" rel="noopener noreferrer" className="flex flex-col">
                     <Image className={`${project_key} brighten rounded-md md:block hidden`}
                         src={`/icons/projects/${project_key}.jpg`}

@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 export default function BlogGridView({ imagePath, title, subtitle, category, date, path }) {
     return (
-        <div className='flex flex-col'>
+        <div className='hover:scale-[1.01] flex flex-col'>
             <Link href={`/blogs/${path}`} passHref target="_blank">
                 <Image className={`rounded-md md:block hidden brighten`}
                     src={imagePath}

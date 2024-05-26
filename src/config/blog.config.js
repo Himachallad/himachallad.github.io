@@ -30,6 +30,14 @@ const blogs = [
         category: "Marketing",
         date: "1 May 2024",
         path: "scale_using_digital_marketting"
+    },
+    {
+        title: "Grind 75",
+        subtitle: "Top Leetcode problems that are must solve",
+        imagePath: "/icons/blogs/business_200x.jpg",
+        category: "Marketing",
+        date: "26 May 2024",
+        path: "seventy_five_leetcode_problems"
     }
 ];
 

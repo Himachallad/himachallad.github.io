@@ -5,6 +5,8 @@ import { useEffect, useState } from 'react';
 import labelsInfo from './label.config';
 import { Button } from 'antd';
 import Link from 'next/link';
+import { motion } from "framer-motion";
+import { InView } from 'react-intersection-observer';
 
 export default function Blogs({ disableLink }) {
 
@@ -41,22 +43,37 @@ export default function Blogs({ disableLink }) {
     });
 
     const renderedBlogs = filteredBlogs.map(({ title, subtitle, imagePath, category, date, path }, idx) => {
-        return (<BlogGridView
-            key={`blog_${idx}`}
-            title={title}
-            subtitle={subtitle}
-            imagePath={imagePath}
-            category={category}
-            date={date}
-            path={path}
-        />);
+        const direction = idx % 2 === 0 ? -100 : 100; // alternate left (-) and right (+)
+
+        return (
+            <InView triggerOnce key={`blog_${idx}`}>
+                {({ ref, inView }) => (
+                    <motion.div
+                        ref={ref}
+                        initial={{ opacity: 0, x: direction }}
+                        animate={inView ? { opacity: 1, x: 0 } : { opacity: 0, x: direction }}
+                        transition={{ duration: 0.6, ease: "easeOut" }}
+                    >
+                        <BlogGridView
+                            title={title}
+                            subtitle={subtitle}
+                            imagePath={imagePath}
+                            category={category}
+                            date={date}
+                            path={path}
+                        />
+                    </motion.div>
+                )}
+            </InView>
+
+        );
     });
 
     const header = disableLink ? (<h1 className='cursor-default font-bold text-4xl mb-10'>Blogs</h1>) : <Link href={`/blogs`} passHref target="_blank"><h1 className='hover:text-sky-500 cursor-pointer font-bold text-4xl mb-10'>Blogs</h1></Link>;
 
     return <>
-        {header}
-        <div className='flex justify-center mb-[20px] sm:flex-row flex-col'>{renderedLabels}</div>
+        {/* {header} */}
+        {/* <div className='flex justify-center mb-[20px] sm:flex-row flex-col'>{renderedLabels}</div> */}
         <div className='flex justify-center mb-[50px]'>
             <div className="inline-grid xl:grid-cols-2 grid-cols-1 gap-[100px]">
                 {renderedBlogs}

@@ -19,7 +19,7 @@
   position: fixed;
   top: 0;
   z-index: 51;
-  background-color: rgb(16, 140, 16);
+  background-color: #c94a64;
   width: 100%;
   transform-origin: left;
   animation: scroll-watcher linear;

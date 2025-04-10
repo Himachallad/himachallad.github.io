@@ -7,12 +7,15 @@ import { Divider } from 'antd';
 
 export default function Home() {
   return (
-    <main className="pt-24 ml-20 mr-20">
+    <main style={{
+      background: 'linear-gradient(to right, #fbd3e9, #f7797d)',
+      minHeight: '100vh',
+      padding: '4rem 2rem',
+      textAlign: 'center'
+    }}>
       <Introduction />
-      <KnownTechnologies />
-      <Reviews />
-      <Projects />
-      <Divider />
+      {/* <Projects /> */}
+      {/* <Divider /> */}
       <Blogs />
     </main>
   );

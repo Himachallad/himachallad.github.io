@@ -8,9 +8,9 @@ import { Divider } from 'antd';
 export default function Home() {
   return (
     <main style={{
-      background: 'linear-gradient(to right, #fbd3e9, #f7797d)',
+      background: 'linear-gradient(to right, #2c2c2c, #404040)',
       minHeight: '100vh',
-      padding: '4rem 2rem',
+      // padding: '4rem 2rem',
       textAlign: 'center'
     }}>
       <Introduction />

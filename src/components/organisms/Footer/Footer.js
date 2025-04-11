@@ -2,7 +2,7 @@ import Image from 'next/image';
 
 export default function Footer() {
     return <>
-        <div className="p-8 flex flex-row justify-end bg-[#db5f77] gap-4">
+        <div className="p-8 flex flex-row justify-end bg-[#000] gap-4">
             <div className="flex flex-col">
                 <div className="text-white flex mb-5">
                     <a href="https://www.linkedin.com/in/himachallad/" target="_blank" rel="noopener noreferrer" className="flex">

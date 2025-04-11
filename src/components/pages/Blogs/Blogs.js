@@ -69,12 +69,12 @@ export default function Blogs({ disableLink }) {
         );
     });
 
-    const header = disableLink ? (<h1 className='cursor-default font-bold text-4xl mb-10'>Blogs</h1>) : <Link href={`/blogs`} passHref target="_blank"><h1 className='hover:text-sky-500 cursor-pointer font-bold text-4xl mb-10'>Blogs</h1></Link>;
+    const header = disableLink ? (<h1 className='cursor-default font-bold text-4xl mb-10'>Blogs</h1>) : <Link href={`/blogs`} passHref target="_blank"><h1 className='hover:text-white cursor-pointer font-bold text-4xl mb-10'>Blogs</h1></Link>;
 
     return <>
         {/* {header} */}
         {/* <div className='flex justify-center mb-[20px] sm:flex-row flex-col'>{renderedLabels}</div> */}
-        <div className='flex justify-center mb-[50px]'>
+        <div className='flex justify-center'>
             <div className="inline-grid xl:grid-cols-2 grid-cols-1 gap-[100px]">
                 {renderedBlogs}
             </div>

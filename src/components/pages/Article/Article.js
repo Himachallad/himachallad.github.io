@@ -64,7 +64,7 @@ const markdownComponents = () => {
         a: (props) => {
             const { children, href } = props;
             return <Link className="no-underline text-sky-500 font-light cursor-pointer" href={href} passHref target="_blank">{children}</Link>;
-        }
+        },
     };
 };
 
@@ -79,7 +79,7 @@ export default function Articles(props) {
     prose-code:bg-code-color prose-code:font-light prose-code:text-[20px]
     prose-code:leading-[28px] prose-code:text-inherit
     prose-code:after:content-none prose-code:before:content-none
-    prose-pre:bg-inherit prose-pre:px-0">
+    prose-pre:bg-inherit prose-pre:px-0 prose-invert">
         <Markdown components={markdownComponents()}>{articleBody}</Markdown>
     </article >;
 }

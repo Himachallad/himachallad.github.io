@@ -2,7 +2,7 @@ const blogs = [
     {
         title: "10 Most Asked JavaScript Interview Questions",
         subtitle: "Are you ready for the challenge?",
-        imagePath: "/icons/blogs/learn_js.jpg",
+        imagePath: "/icons/blogs/top10jsquestions.jpg",
         category: "JavaScript",
         date: "1 May 2024",
         path: "top_10_javascript_interview_questions"

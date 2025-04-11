@@ -68,7 +68,7 @@ export default function Projects() {
 
     return <>
         <h1 className={`font-bold text-4xl mt-20 mb-10`}>Projects</h1>
-        <div className='flex justify-center mb-[50px]'>
+        <div className='flex justify-center'>
             <div className="inline-grid xl:grid-cols-2 gap-[100px]">
                 {projects}
             </div>

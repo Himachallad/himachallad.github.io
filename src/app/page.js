@@ -1,22 +1,18 @@
 import Introduction from '@/components/organisms/Introduction';
-import KnownTechnologies from '@/components/organisms/KnownTechnologies';
+// import KnownTechnologies from '@/components/organisms/KnownTechnologies';
 import Blogs from '@/components/pages/Blogs';
-import Projects from '@/components/pages/Projects';
-import Reviews from '@/components/pages/Reviews';
-import { Divider } from 'antd';
+// import Projects from '@/components/pages/Projects';
+// import Reviews from '@/components/pages/Reviews';
+// import { Divider } from 'antd';
+import MainLayout from '@/components/templates/MainLayout';
 
 export default function Home() {
   return (
-    <main style={{
-      background: 'linear-gradient(to right, #2c2c2c, #404040)',
-      minHeight: '100vh',
-      // padding: '4rem 2rem',
-      textAlign: 'center'
-    }}>
-      <Introduction />
-      {/* <Projects /> */}
-      {/* <Divider /> */}
-      <Blogs />
-    </main>
+    <MainLayout>
+      <div className="">
+        <Introduction />
+        <Blogs />
+      </div>
+    </MainLayout>
   );
 }

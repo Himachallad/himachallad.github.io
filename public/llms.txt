@@ -1,0 +1,8 @@
+# Himachallad's Blog - Technical Architecture & Engineering
+
+This site contains deep-dive engineering articles on distributed systems, AI infrastructure, and high-performance computing.
+
+- [Scaling Milvus for Billion-Scale Search](https://himachallad.github.io/blogs/scaling_milvus_billion_scale): Architecting vector databases for high-throughput enterprise retrieval.
+- [System Design: Distributed Web Crawler](https://himachallad.github.io/blogs/designing_distributed_web_crawler): Challenges in URL frontier management, politeness policies, and fault tolerance.
+- [Python Performance for AI Pipelines](https://himachallad.github.io/blogs/python_performance_optimization): Profiling, async I/O, and compiled extensions for maximum throughput.
+- [Event-Driven Microservices with Kafka](https://himachallad.github.io/blogs/event_driven_kafka): Decoupling systems and ensuring data consistency at scale.

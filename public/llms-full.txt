@@ -1,0 +1,396 @@
+# Himachallad's Complete Technical Blog
+Combined content for Context Window ingestion.
+
+---
+
+## ARTICLE: Scaling Milvus for Billion-Scale Search
+URL: https://himachallad.github.io/blogs/scaling_milvus_billion_scale
+
+# Scaling Milvus: Architecting for Billion-Scale Vector Retrieval
+
+## The Challenge: Hitting the Hardware Wall
+In large-scale enterprise environments, "billion-scale" isn't a buzzword—it's an infrastructure liability. 
+A standard 768-dimensional float32 vector requires approx **3KB** of storage. 
+For **1 Billion vectors**, the raw data alone consumes **3TB**. 
+Most high-memory instances (e.g., AWS r6g.16xlarge) cap at 512GB RAM. 
+Trying to load a 3TB index into memory is physically impossible on a single node.
+
+This forces a distributed architecture where the bottleneck shifts from **compute** to **memory bandwidth** and **network I/O**.
+
+## High Level Design (HLD)
+
+We moved from a monolithic vector engine to a sharded, distributed retrieval system using a **Scatter-Gather** pattern.
+
+```mermaid
+graph TD
+    Client[Client Request] --> LB[Load Balancer]
+    LB --> Coordinator[Query Coordinator]
+    Coordinator -->|RPC Fan-out| Shard1["Shard A (Kubernetes Pod)"]
+    Coordinator -->|RPC Fan-out| Shard2["Shard B (Kubernetes Pod)"]
+    Coordinator -->|RPC Fan-out| Shard3["Shard C (Kubernetes Pod)"]
+    
+    subgraph "Shard Architecture"
+        Shard1 --> Cache["L1 Cache (Redis)"]
+        Shard1 --> Index[(Milvus Segment)]
+        Index --> Disk[NVMe Persistency]
+    end
+    
+    Shard1 -->|Top-K Results| Aggregator[Priority Queue Aggregator]
+    Shard2 -->|Top-K Results| Aggregator
+    Shard3 -->|Top-K Results| Aggregator
+    Aggregator -->|Global Top-K| ReRanker[Cross-Encoder Re-ranker]
+    ReRanker --> Client
+```
+
+
+### Architecture Breakdown
+
+This isn't just a diagram; it's the physical path of a query. Let's trace a 15ms lifecycle:
+
+1.  **Load Balancer & Coordinator**: The query enters via the LB to a stateless Coordinator. The Coordinator does NOT search. It functions as a **MapReduce master**, fan-out broadcasting the query to all active Shard Leaders.
+2.  **RPC Fan-out**: We used gRPC for inter-node communication. Each shard is an independent pod that owns 1/Nth of the dataset (approx 20 million vectors per shard).
+3.  **Shuffle & Sharding**: Data is sharded by `consistent_hashing(entity_id)`. This ensures that even if we lose a node, rebalancing only moves $1/N$ of the data.
+4.  **Local Execution (The "Leaf")**: Inside each Kubernetes Pod (Query Node), the search executes across **hundreds of local segments** (sealed data files). A single pod manages ~20M vectors divided into 512MB segments.
+5.  **Global Aggregation**: Each shard returns its local `Top-K`. The Aggregator prioritizes these partial results into a global `Top-K`.
+6.  **Re-Ranking**: The raw IVF_PQ results are approximate. The Re-Ranker pulls the full-precision vectors for just the finalists and re-scores them to achieve 99% accuracy.
+
+## Deep Dive: Indexing Strategy - The Memory Limit
+
+To understand why standard indexing fails at this scale, we must look at the data structures.
+
+### The HNSW Trap (Hierarchical Navigable Small World)
+HNSW is the industry standard for in-memory vector search because it offers $O(\log N)$ time complexity. It builds a multi-layer graph where:
+*   **Layer 0**: Contains all nodes (vectors).
+*   **Layer N**: Contains a subset of nodes acting as "expressways" to skip across the graph.
+
+**The Problem**: Every node needs to maintain connectivity logic (Friends List).
+For a graph with `M=16` (max edges per node), you store 16 integer pointers per vector.
+$$ \text{Overhead} \approx 16 \times 4 \text{ bytes} \times 2 (\text{bidirectional}) = 128 \text{ bytes} $$
+This sounds small, but for **1 Billion vectors**, the graph connectivity *alone* consumes **128GB of RAM**—before you even load the 3TB of actual vector data.
+
+### The Enterprise Solution: IVF_PQ + SSD Offloading
+
+We moved from a "Pure In-Memory" mindset to a "Memory-Mapped" strategy.
+
+#### 1. Inverted File Index (IVF) - The Coarse Quantizer
+Instead of a massive flat graph, we perform **Voronoi Tessellation** on the vector space.
+*   We train `nlist=65536` centroids (cluster centers) using K-Means.
+*   Every billion vectors are assigned to their nearest centroid.
+*   **Search Time**: Instead of scanning 1B vectors, we confirm which centroid the query vector falls into, and then only scan the vectors in that cell (and perhaps its neighbors, defined by `nprobe`).
+*   **Optimization**: This reduces the search space by factor of $\frac{1}{\text{nlist}} \approx \frac{1}{65000}$.
+
+#### 2. Product Quantization (PQ) - The Compression
+Even with IVF, storing 3TB of float32 vectors on disk is slow to read. We need to shrink the vectors.
+PQ splits the 768-dimensional vector into $m=64$ sub-spaces.
+*   Each sub-vector (12 dimensions) is quantized into one of 256 centroids (1 byte).
+*   We replace the raw float32 values with the *ID* of the nearest centroid.
+*   **Math**: $768 \times 32 \text{ bits} \to 64 \times 8 \text{ bits}$.
+*   **Result**: A 96% reduction in storage I/O, allowing us to perform the coarse search entirely in memory while keeping the raw data on NVMe SSDs for the final re-ranking.
+
+## Addressing the Recall Gap
+The aggressive compression of PQ reduces recall (accuracy).
+$$ \text{HNSW Recall@10} \approx 0.98 $$
+$$ \text{IVF\_PQ Recall@10} \approx 0.85 $$
+
+To bridge this 13% gap without exploding memory, we implemented a **Two-Stage Retrieval** pipeline.
+
+### Stage 2: Cross-Encoder Re-Ranking
+We fetch `Top-100` candidates using the fast but lossy IVF_PQ index, then fetch the full raw text/vectors for just those 100 items and pass them through a BERT-based Cross-Encoder.
+
+
+```python
+from sentence_transformers import CrossEncoder
+import numpy as np
+
+# Load a high-precision but slow model
+model = CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2', device='cuda')
+
+def re_rank_candidates(query: str, candidates: list[dict]):
+    """
+    candidates: List of { 'id': int, 'text': str, 'score': float }
+    """
+    # Create (Query, Document) pairs
+    pairs = [(query, doc['text']) for doc in candidates]
+    
+    # Inference on GPU (Batch size 100 takes ~15ms)
+    scores = model.predict(pairs)
+    
+    # Re-sort based on semantic similarity
+    ranked_indices = np.argsort(scores)[::-1]
+    return [candidates[i] for i in ranked_indices[:10]]
+```
+
+## Optimizing Network Throughput
+A hidden killer in distributed search is the serialization overhead of returning large feature vectors.
+We utilized **Protocol Buffers (gRPC)** instead of JSON over REST, reducing payload size by 40% and deserialization CPU time by 70%.
+
+## Conclusion
+Scaling is not about throwing more hardware at the problem; it's about understanding the specific bottlenecks of your data structure. By accepting a controllable loss in precision (PQ) and correcting it with compute (Re-ranking), we achieved **billion-scale retrieval on commodity hardware**.
+
+
+---
+
+## ARTICLE: System Design: Distributed Web Crawler
+URL: https://himachallad.github.io/blogs/designing_distributed_web_crawler
+
+# Architecting a 10B Page/Day Distributed Crawler
+
+## The Challenge: The Politeness vs. Throughput Paradox
+In an enterprise crawling environment, the goal isn't just speed; it's **sustainable throughput**. 
+Hitting 10 million domains a day requires a system that is aggressive enough to meet SLAs but "polite" enough to avoid getting IP-banned.
+The central engineering challenge is **Distributed Rate Limiting**. How do you ensure that 500 crawler nodes collectively do not hit `wikipedia.org` more than 10 times per second?
+
+## High Level Design (HLD)
+
+We moved away from a simple queue-based system to a partitioned architecture managed by a custom "Frontier" service.
+
+```mermaid
+graph LR
+    Seed[Seed URLs] --> Frontier[URL Frontier Service]
+    Frontier -->|Partition Key: Domain| Kafka[Kafka Topics]
+    
+    subgraph "Worker Node Cluster"
+        Kafka -->|Consumer Group| Worker1[Worker A]
+        Kafka -->|Consumer Group| Worker2[Worker B]
+        Worker1 -->|Async DNS| Resolver[Custom DNS Resolver]
+        Worker1 -->|Fetch| Internet((The Web))
+        Internet -->|HTML| Parser[Content Parser]
+        Parser -->|Extracted Links| Dedupe[Bloom Filter Deduper]
+        Dedupe -->|New URLs| Frontier
+        Parser -->|Clean Data| Storage[(S3 / BigQuery)]
+    end
+```
+
+## The URL Frontier: Implementing Drumm-Buffers
+A standard FIFO queue fails because it mixes "fast" domains (your own CDN) with "slow" domains (rate-limited sites).
+We implemented a **Drumm-Buffer** (Dynamic Ranked URL Memory Manager) inspired by the Mercator crawler.
+
+1.  **Front Queues (Priority)**: $F_1 \dots F_n$. URLs are placed here based on PageRank or Business Priority.
+2.  **Back Queues (Politeness)**: $B_1 \dots B_m$. Each queue maps to exactly **one domain**.
+3.  **Heap Mapper**: A min-heap tracks the "Next Allowable Request Time" for each Back Queue.
+
+```python
+import heapq
+import time
+
+class PolitenessHeap:
+    def __init__(self):
+        # (next_request_time, queue_id)
+        self.heap = []
+        
+    def push_domain(self, queue_id, last_access_time, crawl_delay):
+        next_time = last_access_time + crawl_delay
+        heapq.heappush(self.heap, (next_time, queue_id))
+        
+    def pop_ready_queue(self):
+        if not self.heap:
+            return None
+            
+        next_time, queue_id = self.heap[0]
+        if next_time > time.time():
+            # Nothing is ready, system should sleep or process maintenance
+            return None
+            
+        return heapq.heappop(self.heap)[1]
+```
+
+## Scale Challenge: DNS Resolution
+At 50,000 requests per second, the OS-level `getaddrinfo` becomes a blocking bottleneck. Linux default DNS caching is insufficient for this volume.
+We built a custom **Async DNS Resolver** in Rust using `trust-dns`.
+*   **Caching Strategy**: We respect TTL but pre-fetch hot domains before expiry.
+*   **Concurrency**: 100% non-blocking. A single thread handles 10k DNS lookups.
+
+## Deduplication: The Storage Cost
+Storing 100 Billion URLs in a database index for "Accepted/Rejected" checks is expensive.
+We utilized a **Bloom Filter** with a specialized rotation strategy.
+
+*   **Size**: 20GB memory-mapped file.
+*   **Error Rate**: Tuning for $p=0.001$ false positive rate is acceptable (skipping 1 in 1000 valid pages is better than crashing storage).
+*   **content-deduplication**: We use **SimHash** (locality-sensitive hashing) to detect near-duplicate content (e.g., essentially the same page but with different session IDs).
+
+## Conclusion
+Building a crawler is an exercise in edge-case management. The happy path is 10% of the code. The other 90% is handling malformed HTML, infinite redirect loops, spider traps, and aggressive rate limiters.
+
+
+---
+
+## ARTICLE: Python Performance for AI Pipelines
+URL: https://himachallad.github.io/blogs/python_performance_optimization
+
+# Extreme Python: Optimizing for High-Frequency Trading Speeds
+
+## The Challenge: Microsecond Latency in Python
+Python is the language of Data Science, but it is rarely the language of High-Frequency Trading (HFT) or Real-Time Bidding (RTB). 
+However, the ecosystem (pytorch, numpy, pandas) is too valuable to discard. 
+The challenge is: **How do we keep the developer velocity of Python while hitting C++ latency targets?**
+
+We encountered this when building a real-time geospatial inference engine that needed to process **100,000 events per second**.
+
+## High Level Design (HLD)
+
+The architecture relies on a **"Split-Brain"** model. The control plane runs in pure Python, while the data plane stays entirely in unmanaged memory (C/C++), enabling us to bypass the GIL (Global Interpreter Lock).
+
+```mermaid
+graph TD
+    Input["Data Ingestion (Kafka)"] -->|Protobuf| Python[Python Orchestrator]
+    Python -->|Zero-Copy Pointer| SharedMem["Shared Memory (Plasma Store)"]
+    
+    subgraph "The No-GIL Zone"
+        SharedMem --> Cython[Cython Worker 1]
+        SharedMem --> Rust[Rust Extension Worker 2]
+        SharedMem --> Numba[Numba JIT Worker 3]
+    end
+    
+    Cython -->|Result Pointer| Output[Data Egress]
+```
+
+## Solution 1: Bypassing the GIL with Cython
+We identified a hot loop calculating Haversine distances that was consuming 60% of CPU.
+Rewriting it in **Cython** with direct C-level memory access and OpenMP parallelism yielded a **100x speedup**.
+
+```python
+# fast_geo.pyx
+# cython: boundscheck=False, wraparound=False, cdivision=True, nonecheck=False
+
+cimport cython
+from libc.math cimport sqrt, sin, cos, radians
+
+def parallel_distance_calc(double[:] lats, double[:] lons):
+    cdef int n = lats.shape[0]
+    cdef double[:] results = ... # Pre-allocated memory
+    cdef int i
+    
+    # Release the GIL to allow multi-core execution
+    with nogil:
+        for i in range(n):
+            results[i] = _haversine_c(lats[i], lons[i])
+            
+    return results
+```
+**Impact**: The `with nogil` context manager allows other Python threads to run freely, effectively giving us true multi-threading in Python.
+
+## Solution 2: Zero-Copy IPC
+Passing largy NumPy arrays between processes using `multiprocessing.Queue` triggers **Pickling**, which copies data. 
+At 1GB/sec throughput, copying is the bottleneck.
+We implemented **Zero-Copy IPC** using `multiprocessing.shared_memory`.
+
+```python
+# Writer Process
+from multiprocessing.shared_memory import SharedMemory
+import numpy as np
+
+# Create 1GB shared buffer
+shm = SharedMemory(create=True, size=1024*1024*1024, name='hft_buffer')
+shared_arr = np.ndarray((1024, 1024), dtype=np.float64, buffer=shm.buf)
+shared_arr[:] = heavy_computation() # Direct write to shared RAM
+
+# Reader Process
+existing_shm = SharedMemory(name='hft_buffer')
+read_arr = np.ndarray((1024, 1024), dtype=np.float64, buffer=existing_shm.buf)
+# read_arr is instantly available, NO COPYING occurred!
+```
+
+## Solution 3: JIT Compilation with Numba
+For ad-hoc mathematical functions where writing C is overkill, we use **Numba**.
+It inspects Python bytecode matches it to LLVM IR, generating optimized machine code at runtime.
+
+```python
+from numba import njit, prange
+
+@njit(parallel=True, fastmath=True)
+def monte_carlo_pi(nsamples):
+    acc = 0
+    for i in prange(nsamples):
+        x = np.random.random()
+        y = np.random.random()
+        if (x**2 + y**2) < 1.0:
+            acc += 1
+    return 4.0 * acc / nsamples
+```
+**Result**: This runs within 5% of the speed of handwritten Fortran.
+
+## Conclusion
+Python is not slow; the interpreter is slow. By treating Python as a "glue" language that orchestrates high-performance kernels (Cython/Rust/Numba), we can build systems that rival C++ engines in performance while maintaining Python's superior developer experience.
+
+
+---
+
+## ARTICLE: Event-Driven Microservices with Kafka
+URL: https://himachallad.github.io/blogs/event_driven_kafka
+
+# Enterprise Event Mesh: Kafka at Petabyte Scale
+
+## The Challenge: Beyond "Pub/Sub"
+In a mature enterprise architecture, Kafka is not just a pipe; it is the **System of Record** for state changes. 
+Handling petabytes of retention and millions of messages per second introduces "Day 2" operations problems that basic tutorials ignore:
+1.  **Duplicate Processing**: At scale, "At-Least-Once" delivery guarantees duplicates.
+2.  **Rebalancing Storms**: A single slow consumer can halt processing for the entire cluster.
+3.  **Data Governance**: Schema evolution without breaking downstream teams.
+
+## High Level Design (HLD)
+
+Our architecture treats the Kafka Cluster as the central nervous system, with strict contracts (Schema Registry) and active stream processing (Kafka Streams/KSQL).
+
+```mermaid
+graph TD
+    Source[Microservice A] -->|Avro + Schema ID| Proxy[Sidecar Proxy]
+    Proxy -->|Validation| Kafka[Kafka Cluster]
+    
+    subgraph "Stream Processing Layer"
+        Kafka -->|Topic A| KStream[Kafka Streams App]
+        KStream -->|State Store| RocksDB[(RocksDB)]
+        KStream -->|Aggregated Data| TopicB["Topic B (Enriched)"]
+    end
+    
+    TopicB -->|Sink Connect| DW["Data Warehouse (Snowflake)"]
+    TopicB -->|Consumer Group| ServiceB[Microservice B]
+```
+
+## Challenge 1: The "Exactly-Once" Grail
+Financial transactions require Exactly-Once Semantics (EOS). We cannot double-charge a customer.
+We utilized **Kafka Transactions** (KIP-98) which allows atomic writes across multiple partitions.
+
+```java
+// Atomic "Read-Process-Write"
+producer.initTransactions();
+
+try {
+    producer.beginTransaction();
+    
+    // 1. Process data
+    ConsumerRecords records = consumer.poll(Duration.ofMillis(100));
+    process(records);
+    
+    // 2. Write result to output topic
+    producer.send(new ProducerRecord<>("output-topic", result));
+    
+    // 3. Commit offsets AND data atomically
+    producer.sendOffsetsToTransaction(offsets, consumer.groupMetadata());
+    producer.commitTransaction();
+} catch (Exception e) {
+    producer.abortTransaction();
+}
+```
+This ensures that the output message and the offset commit happen **together**. If one fails, both rollback.
+
+## Challenge 2: Rebalancing Storms
+With 500+ consumers in a group, a "Stop-the-World" rebalance can take minutes.
+We implemented **Static Membership** (KIP-345). By assigning a persistent `group.instance.id` to each Kubernetes pod, transient restarts (e.g., rolling deploys) do **not** trigger a rebalance. The group leader "holds" the partition assignment for `session.timeout.ms` (e.g., 5 mins).
+
+```properties
+# consumer.properties configuration
+group.instance.id=pod-payment-service-x9s2
+session.timeout.ms=300000 
+heartbeat.interval.ms=3000
+```
+**Result**: 0% downtime during rolling deployments.
+
+## Challenge 3: Schema Evolution
+JSON payloads are a liability. A typo in a field name breaks consumers 3 hops downstream.
+We enforced **Avro with Confluent Schema Registry**.
+*   **Compatibility Mode**: `FORWARD_TRANSITIVE`.
+*   Producers *cannot* publish unless the schema is registered and compatible.
+*   Consumers automatically download schemas to deserialize messages.
+
+## Conclusion
+Kafka at scale is about **Governance**. You need strict types (Avro), atomic guarantees (Transactions), and stability patterns (Static Membership). Treating Kafka as a "dumb pipe" is a recipe for data corruption.

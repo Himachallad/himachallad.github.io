@@ -1,78 +1,28 @@
-import { Roboto } from "next/font/google";
+import { Inter, Roboto_Mono } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/organisms/Header";
-import Footer from "@/components/organisms/Footer";
-import Script from "next/script";
+// import Header from "@/components/organisms/Header"; // Moving to MainLayout
+// import Footer from "@/components/organisms/Footer"; // Moving to MainLayout
 import { AntdRegistry } from '@ant-design/nextjs-registry';
+import 'katex/dist/katex.min.css';
 
-
-const roboto = Roboto({ subsets: ["latin"], weight: '300' });
+const inter = Inter({ subsets: ["latin"], variable: '--font-inter' });
+const robotoMono = Roboto_Mono({ subsets: ["latin"], variable: '--font-roboto-mono' });
 
 export const metadata = {
-  title: "Himachallad",
-  defaultTitle: "Himachallad",
-  generator: "Himachallad",
-  applicationName: "Himachallad",
-  referrer: "origin-when-cross-origin",
-  keywords: ["Himachallad", "Nikhil Pathania Upwork", "Hire data scraper", "AI expert online"],
-  authors: [{ name: 'Nikhil Pathania' }, { name: 'Himachallad', url: "https://medium.com/@nikhilpathania_57075" }],
-  creator: 'Nikhil Pathania',
-  publisher: 'Nikhil Pathania',
-  formatDetection: {
-    email: false,
-    address: false,
-    telephone: false,
-  },
-
-  description: "Himachallad's Portfolio",
-  openGraph: {
-    type: "website",
-    locale: "en_US",
-    url: "https://himachallad.github.io",
-    images: [
-      {
-        url: "https://github.com/Himachallad/himachallad.github.io/assets/20709166/fb5c022b-f0f0-41c3-af1e-743cc49f0422",
-        width: 128,
-        height: 128,
-      }
-    ],
-    description: "Exploring new changes in Tech, and helping the community",
-    siteName: "Himachallad",
-    title: "Himachallad"
-  },
-  robots: {
-    index: false,
-    follow: true,
-    nocache: true,
-    googleBot: {
-      index: true,
-      follow: false,
-      noimageindex: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
-    },
-  },
-  twitter: {
-    creator: "@nikhil_nits",
-    title: "Himachallad",
-    cardType: "summary_large_image"
+  title: "Himachallad | Portfolio",
+  description: "Senior Backend Engineer & Tech Enthusiast",
+  icons: {
+    icon: '/favicon/favicon.ico',
   }
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <head>
-        <link rel="icon" href="/favicon/favicon.ico" sizes="any" />
-      </head>
-
-      <Script src="https://flackr.github.io/scroll-timeline/dist/scroll-timeline.js" />
-      <body className={`${roboto.className} bg-green-50`}>
-
-        <Header />
-        <AntdRegistry>{children}</AntdRegistry>
-        <Footer />
+    <html lang="en" className={`${inter.variable} ${robotoMono.variable}`}>
+      <body className="font-sans bg-dark-900 text-light-text selection:bg-primary selection:text-dark-900">
+        <AntdRegistry>
+          {children}
+        </AntdRegistry>
       </body>
     </html>
   );

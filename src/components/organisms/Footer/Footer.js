@@ -1,41 +1,37 @@
 import Image from 'next/image';
 
 export default function Footer() {
-    return <>
-        <div className="p-8 flex flex-row justify-end bg-[#000] gap-4">
-            <div className="flex flex-col">
-                <div className="text-white flex mb-5">
-                    <a href="https://www.linkedin.com/in/himachallad/" target="_blank" rel="noopener noreferrer" className="flex">
-                        <Image className="linkedin mr-4 cursor-pointer"
-                            src={`/icons/social/linkedin.svg`}
-                            key={"linkedin"}
-                            alt="linkedin-logo"
-                            width={48}
-                            height={48}
-                        />
-                    </a>
-                    {/* <a href="https://www.upwork.com/freelancers/~017c77e6882cfe931f" target="_blank" rel="noopener noreferrer" className="flex">
-                        <Image className="upwork mr-4 cursor-pointer"
-                            src={`/icons/social/upwork.svg`}
-                            key={"upwork"}
-                            alt="upwork-logo"
-                            width={48}
-                            height={48}
-                        />
-                    </a> */}
-                    <a href="https://github.com/Himachallad" target="_blank" rel="noopener noreferrer" className="flex">
-                        <Image className="github cursor-pointer"
-                            src={`/icons/social/github.svg`}
-                            key={"github"}
-                            alt="github-logo"
-                            width={48}
-                            height={48}
-                        />
-                    </a>
+    const currentYear = new Date().getFullYear();
 
+    return (
+        <footer className="border-t border-white/10 bg-dark-900 text-center relative z-10">
+            <div className="container mx-auto px-4 py-12 flex flex-col items-center justify-center gap-6">
+                <div className="flex gap-6">
+                    <a href="https://www.linkedin.com/in/himachallad/" target="_blank" rel="noopener noreferrer" className="group p-3 bg-white/5 rounded-full hover:bg-secondary/20 transition-all duration-300">
+                        <Image className="filter invert group-hover:invert-0 opacity-70 group-hover:opacity-100 transition-all"
+                            src={`/icons/social/linkedin.svg`}
+                            alt="linkedin-logo"
+                            width={24}
+                            height={24}
+                        />
+                    </a>
+                    <a href="https://github.com/Himachallad" target="_blank" rel="noopener noreferrer" className="group p-3 bg-white/5 rounded-full hover:bg-secondary/20 transition-all duration-300">
+                        <Image className="filter invert group-hover:invert-0 opacity-70 group-hover:opacity-100 transition-all"
+                            src={`/icons/social/github.svg`}
+                            alt="github-logo"
+                            width={24}
+                            height={24}
+                        />
+                    </a>
                 </div>
-                <div className=" text-white">Copyright © 2025 Nikhil Pathania</div>
+
+                <p className="text-light-muted text-sm">
+                    © {currentYear} <span className="text-white font-semibold">Nikhil Pathania</span>. All rights reserved.
+                </p>
+                <p className="text-xs text-light-muted/50">
+                    Built with Next.js, Tailwind CSS & Framer Motion
+                </p>
             </div>
-        </div>
-    </>;
+        </footer>
+    );
 }

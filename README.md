@@ -1,23 +1,46 @@
-## Getting Started
+# Himachallad.github.io - Enterprise Portfolio V3
+
+High-performance personal portfolio and engineering blog built for the AI era.
+
 ![Firefly H logo 91409 (1) (1)](https://github.com/Himachallad/himachallad.github.io/assets/20709166/fb5c022b-f0f0-41c3-af1e-743cc49f0422)
 
-Node version: 18.20.0
+## 🚀 Key Features
 
-First, run the development server:
+### 1. Enterprise Engineering Blog
+Deep-dive technical articles focusing on high-level system design, distributed systems, and performance engineering.
+- **Interactive HLDs**: Mermaid-based architectural diagrams.
+- **Internal Deep Dives**: Mathematical breakdowns of algorithms (HNSW, PQ, Bloom Filters).
+
+### 2. AI-Native Accessibility
+Fully optimized for LLM consumption.
+- **[`/llms.txt`](public/llms.txt)**: Standardized manifest for AI agents.
+- **[`/llms-full.txt`](public/llms-full.txt)**: Concatenated context window dump for RAG ingestion.
+- **Automation**: `npm run build:llm` script to auto-generate these assets.
+
+### 3. Gamified Experience
+- **Quest System**: Scroll-based progress tracking ("XP Bar").
+- **Rewards**: "Quest Complete" achievements upon finishing technical reads.
+
+## 🛠 Tech Stack
+- **Framework**: Next.js 15 (RC)
+- **Styling**: Tailwind CSS + Custom Typography
+- **Animation**: Framer Motion (Scroll-linked Spring Physics)
+- **Mathematics**: KaTeX + Remark/Rehype
+- **Diagrams**: Mermaid.js
+
+## 🏃 Getting Started
 
 ```bash
+# Install dependencies
+npm install
+
+# Run development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# Build for production (includes LLM text generation)
+npm run build && npm run build:llm
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+## 📜 License
+MIT
 

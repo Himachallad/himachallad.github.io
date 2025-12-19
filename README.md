@@ -40,7 +40,3 @@ npm run dev
 # Build for production (includes LLM text generation)
 npm run build && npm run build:llm
 ```
-
-## 📜 License
-MIT
-

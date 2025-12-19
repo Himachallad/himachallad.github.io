@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import labelsInfo from './label.config';
 import Link from 'next/link';
 import { motion, AnimatePresence } from "framer-motion";
-import { InView } from 'react-intersection-observer';
+
 
 export default function Blogs({ disableLink }) {
     const [labels, setLabels] = useState([...labelsInfo]);
@@ -48,7 +48,7 @@ export default function Blogs({ disableLink }) {
 
             {/* Filters */}
             <div className="flex flex-wrap justify-center gap-4 mb-16">
-                {labelsInfo.map((item, idx) => {
+                {labelsInfo.map((item) => {
                     const isActive = labels.includes(item);
                     return (
                         <button
@@ -67,7 +67,7 @@ export default function Blogs({ disableLink }) {
 
             <motion.div layout className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <AnimatePresence>
-                    {filteredBlogs.map((blog, idx) => (
+                    {filteredBlogs.map((blog) => (
                         <motion.div
                             layout
                             key={blog.path}

@@ -10,7 +10,7 @@ import Link from "next/link";
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import { motion, useScroll, useSpring } from "framer-motion";
-import { useRef, useState, useEffect } from "react";
+import { useState } from "react";
 import { RocketOutlined, FireOutlined, CheckCircleOutlined } from '@ant-design/icons';
 
 const markdownComponents = () => {
@@ -28,7 +28,7 @@ const markdownComponents = () => {
                 {children}
             </div>
         ),
-        code: ({ node, inline, className, children, ...props }) => {
+        code: ({ inline, className, children, ...props }) => {
             const match = /language-(\w+)/.exec(className || '');
             const isMermaid = match && match[1] === 'mermaid';
 
@@ -66,7 +66,7 @@ const markdownComponents = () => {
                 </code>
             );
         },
-        img: ({ node, ...props }) => (
+        img: ({ ...props }) => (
             <div className="my-8 relative rounded-xl overflow-hidden border border-white/10 shadow-2xl group">
                 <div className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity z-10 pointer-events-none mix-blend-overlay" />
                 <img {...props} className="w-full h-auto" alt={props.alt || "Blog Image"} />
@@ -177,7 +177,7 @@ export default function Articles({ blogId }) {
                         <RocketOutlined className="text-4xl" />
                     </div>
                     <h3 className="text-3xl font-black text-white mb-2">QUEST COMPLETE!</h3>
-                    <p className="text-light-muted mb-8">You've gained <span className="text-primary font-bold">+100 EXP</span> in {blogMeta?.category}</p>
+                    <p className="text-light-muted mb-8">You&apos;ve gained <span className="text-primary font-bold">+100 EXP</span> in {blogMeta?.category}</p>
 
                     <a href="/#blogs" className="inline-flex items-center gap-2 px-8 py-3 rounded-full bg-white text-dark-900 font-bold hover:scale-105 transition-transform">
                         <CheckCircleOutlined /> Claim Reward & Return

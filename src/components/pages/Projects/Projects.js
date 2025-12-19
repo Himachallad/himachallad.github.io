@@ -1,7 +1,7 @@
 "use client";
 import { LinkOutlined } from '@ant-design/icons';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 
 function ProjectCard({ project, index }) {
     const ref = useRef(null);
@@ -74,53 +74,52 @@ function ProjectCard({ project, index }) {
     );
 }
 
-export default function Projects() {
-    const projectNames = {
-        "data_scraping": {
-            "name": "Google Image Scraping",
-            "body": "Image Scrap is a tool made to work around Google Chrome's new rules on getting pictures from Google Images. It lets people easily get image data even though Chrome made it harder.",
-            "tech": ["Python", "Selenium", "BS4"]
-        },
-        "covid_tracking": {
-            "name": "World Covid Tracker",
-            "body": "COVID Tracker is a ReactJS project crafted with the assistance of the COVID19 API. It serves as a straightforward tool for monitoring COVID-19 cases and fatalities worldwide.",
-            "tech": ["React", "API", "ChartJS"]
-        },
-        "blogging_website": {
-            "name": "Blogging website",
-            "body": "Pandita is a sleek React blogging website built with Material UI, offering a modern and user-friendly platform for sharing ideas and stories.",
-            "tech": ["React", "MUI", "Firebase"]
-        },
-        "lending_case": {
-            "name": "Lending Case",
-            "body": "Lending Case aims to discern patterns predicting loan default likelihood. By analyzing past loan applicants data, including default history, the project identifies indicators for risk assessment.",
-            "tech": ["Python", "Pandas", "EDA"]
-        },
-        "face_detection": {
-            "name": "Face detection",
-            "body": "Face detection is a Python project utilizing OpenCV for real-time face detection. By leveraging OpenCV's robust features, the project accurately identifies and locates faces within images or video streams.",
-            "tech": ["Python", "OpenCV", "AI"]
-        },
-        "telecom_churn": {
-            "name": "Telecom Churn",
-            "body": "This project focuses on analyzing customer data from a prominent telecom firm to predict and mitigate churn risks. By building predictive models, it implements measures to enhance retention rates.",
-            "tech": ["ML", "Scikit-Learn"]
-        }
-    };
+const projectNames = {
+    "data_scraping": {
+        "name": "Google Image Scraping",
+        "body": "Image Scrap is a tool made to work around Google Chrome's new rules on getting pictures from Google Images. It lets people easily get image data even though Chrome made it harder.",
+        "tech": ["Python", "Selenium", "BS4"]
+    },
+    "covid_tracking": {
+        "name": "World Covid Tracker",
+        "body": "COVID Tracker is a ReactJS project crafted with the assistance of the COVID19 API. It serves as a straightforward tool for monitoring COVID-19 cases and fatalities worldwide.",
+        "tech": ["React", "API", "ChartJS"]
+    },
+    "blogging_website": {
+        "name": "Blogging website",
+        "body": "Pandita is a sleek React blogging website built with Material UI, offering a modern and user-friendly platform for sharing ideas and stories.",
+        "tech": ["React", "MUI", "Firebase"]
+    },
+    "lending_case": {
+        "name": "Lending Case",
+        "body": "Lending Case aims to discern patterns predicting loan default likelihood. By analyzing past loan applicants data, including default history, the project identifies indicators for risk assessment.",
+        "tech": ["Python", "Pandas", "EDA"]
+    },
+    "face_detection": {
+        "name": "Face detection",
+        "body": "Face detection is a Python project utilizing OpenCV for real-time face detection. By leveraging OpenCV's robust features, the project accurately identifies and locates faces within images or video streams.",
+        "tech": ["Python", "OpenCV", "AI"]
+    },
+    "telecom_churn": {
+        "name": "Telecom Churn",
+        "body": "This project focuses on analyzing customer data from a prominent telecom firm to predict and mitigate churn risks. By building predictive models, it implements measures to enhance retention rates.",
+        "tech": ["ML", "Scikit-Learn"]
+    }
+};
 
+const projectLink = {
+    "data_scraping": "https://github.com/Himachallad",
+    "covid_tracking": "https://github.com/Himachallad",
+    "blogging_website": "https://github.com/Himachallad",
+    "lending_case": "https://github.com/Himachallad",
+    "face_detection": "https://github.com/Himachallad",
+    "telecom_churn": "https://github.com/Himachallad"
+};
+
+export default function Projects() {
     const [projects, setProjects] = useState([]);
 
-    const projectLink = {
-        "data_scraping": "https://github.com/Himachallad",
-        "covid_tracking": "https://github.com/Himachallad",
-        "blogging_website": "https://github.com/Himachallad",
-        "lending_case": "https://github.com/Himachallad",
-        "face_detection": "https://github.com/Himachallad",
-        "telecom_churn": "https://github.com/Himachallad"
-    };
-
     useEffect(() => {
-
         const projectList = Object.entries(projectNames).map(([project_key, project_details]) => {
             return {
                 ...project_details,
@@ -129,7 +128,6 @@ export default function Projects() {
             };
         });
         setProjects(projectList);
-
     }, []);
 
     return (
@@ -152,4 +150,4 @@ export default function Projects() {
             </div>
         </section>
     );
-};
+}

@@ -81,7 +81,7 @@ export default function Introduction() {
                             <LinkedinOutlined />
                         </a>
                     </div>
-                    <p className="text-sm text-light-muted mt-2">Let's build something epic</p>
+                    <p className="text-sm text-light-muted mt-2">Let&apos;s build something epic</p>
                     <a href="mailto:himachallad@gmail.com" className="mt-2 text-primary text-sm font-bold hover:underline">
                         himachallad@gmail.com
                     </a>
